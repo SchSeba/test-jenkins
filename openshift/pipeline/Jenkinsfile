@@ -1,6 +1,20 @@
-node('nodejs') {
-  stage 'build'
-  openshiftBuild(buildConfig: 'nodejs-ex', showBuildLogs: 'true')
-  stage 'deploy'
-  openshiftDeploy(deploymentConfig: 'nodejs-ex')
+// node('nodejs') {
+//   stage 'build'
+//   openshiftBuild(buildConfig: 'nodejs-ex', showBuildLogs: 'true')
+//   stage 'deploy'
+//   openshiftDeploy(deploymentConfig: 'nodejs-ex')
+// }
+
+podTemplate(label: 'node',cloud: 'openshift', containers: [
+  containerTemplate(name: 'node-test', image: 'node:6', ttyEnabled: true, command: 'cat')
+  ]) {
+
+  node('node') {
+    stage('Build a Maven project') {
+      git 'https://github.com/SchSeba/test-jenkins'
+      container('node-test') {
+          sh 'npm install' 
+      }
+    }
+  }
 }
