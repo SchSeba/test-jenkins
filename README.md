@@ -1,5 +1,8 @@
 
+oc new-app https://github.com/openshift/nodejs-ex \
+  --context-dir=openshift/pipeline --name nodejs-ex-pipeline
 
+https://radu-matei.com/blog/kubernetes-jenkins-azure/
 <!-- toc -->
 
 - [Node.js sample app on OpenShift!](#nodejs-sample-app-on-openshift)
