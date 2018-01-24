@@ -3,19 +3,14 @@ kind: DeploymentConfig
 metadata:
   annotations:
     openshift.io/generated-by: OpenShiftWebConsole
-  creationTimestamp: '2018-01-22T19:31:32Z'
-  generation: 8
   labels:
-    app: nodejs-ex
-  name: nodejs-ex
+    app: nodejs-seba
+  name: nodejs-seba
   namespace: seba
-  resourceVersion: '8339092'
-  selfLink: /apis/apps.openshift.io/v1/namespaces/seba/deploymentconfigs/nodejs-ex
-  uid: da397081-ffaa-11e7-a24e-06aa3ddefdda
 spec:
   replicas: 1
   selector:
-    deploymentconfig: nodejs-ex
+    deploymentconfig: nodejs-seba
   strategy:
     activeDeadlineSeconds: 21600
     resources: {}
@@ -30,14 +25,12 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: nodejs-ex
-        deploymentconfig: nodejs-ex
+        app: nodejs-seba
+        deploymentconfig: nodejs-seba
     spec:
       containers:
-        - image: >-
-            docker-registry.default.svc:5000/seba/nodejs-ex@sha256:8c92947f854215ea2b9819ea0274824fb314259db41520d8d3bee6f011d0518e
-          imagePullPolicy: Always
-          name: nodejs-ex
+        - image: sebassch/example
+          name: nodejs-seba
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -49,41 +42,43 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-  test: false
-  triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-          - nodejs-ex
-        from:
-          kind: ImageStreamTag
-          name: 'nodejs-ex:latest'
-          namespace: seba
-        lastTriggeredImage: >-
-          docker-registry.default.svc:5000/seba/nodejs-ex@sha256:8c92947f854215ea2b9819ea0274824fb314259db41520d8d3bee6f011d0518e
-      type: ImageChange
-    - type: ConfigChange
-status:
-  availableReplicas: 1
-  conditions:
-    - lastTransitionTime: '2018-01-23T18:23:01Z'
-      lastUpdateTime: '2018-01-23T18:23:01Z'
-      message: Deployment config has minimum availability.
-      status: 'True'
-      type: Available
-    - lastTransitionTime: '2018-01-23T19:35:23Z'
-      lastUpdateTime: '2018-01-23T19:35:25Z'
-      message: replication controller "nodejs-ex-5" successfully rolled out
-      reason: NewReplicationControllerAvailable
-      status: 'True'
-      type: Progressing
-  details:
-    causes:
-      - type: Manual
-    message: manual change
-  latestVersion: 5
-  observedGeneration: 8
-  readyReplicas: 1
-  replicas: 1
-  unavailableReplicas: 0
-  updatedReplicas: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: nodejs-seba
+  name: nodejs-seba
+  namespace: seba
+spec:
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    deploymentconfig: nodejs-seba
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: nodejs-seba
+  name: nodejs-seba
+  namespace: seba
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: nodejs-seba
+    weight: 100
+  wildcardPolicy: None
+
