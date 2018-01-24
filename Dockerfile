@@ -1,4 +1,4 @@
-FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9
+FROM node:6
 
 RUN npm install
 
